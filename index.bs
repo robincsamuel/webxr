@@ -363,7 +363,7 @@ enum XREnvironmentBlendMode {
   // Attributes
   readonly attribute XREnvironmentBlendMode environmentBlendMode;
   [SameObject] readonly attribute XRRenderState renderState;
-  readonly attribute FrozenArray&lt;XRInputSource&gt; inputSources;
+  readonly attribute XRInputSourceArray inputSources;
 
   // Methods
   void updateRenderState(optional XRRenderStateInit state);
@@ -1153,6 +1153,26 @@ The <dfn attribute for="XRInputSource">gamepad</dfn> attribute is a {{Gamepad}} 
  - An axis
 
 NOTE: {{XRInputSource}}s with a <code>null</code> {{gamepad}} can still fire {{select}}, {{selectstart}}, and {{selectend}} events to report binary inputs.
+</section>
+
+<section class="unstable">
+XRInputSourceArray {#xrinputsourcearray-interface}
+------------------
+
+An {{XRInputSourceArray}} represents a [=/list=] of {{XRInputSource}}s. It is used in favor of a [=/frozen array type=] when the contents of the [=/list=] are expected to change over time, such as with the {{XRSession}} {{XRSession/inputSources}} attribute.
+
+<pre class="idl">
+interface XRInputSourceArray {
+  iterable&lt;XRInputSource&gt;;
+  readonly attribute unsigned long length;
+  getter XRInputSource(unsigned long index);
+};
+</pre>
+
+The <dfn attribute for="XRInputSourceArray">length</dfn> attribute of {{XRInputSourceArray}} indicates how many {{XRInputSource}}s are contained within the {{XRInputSourceArray}}.
+
+The <dfn export for="XRInputSourceArray">[=/indexed property getter=]</dfn> of {{XRInputSourceArray}} retrieves the {{XRInputSource}} at the provided index.
+
 </section>
 
 <section class="unstable">
