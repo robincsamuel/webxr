@@ -31,7 +31,7 @@ In addition to a targeting ray, all input sources provide a mechanism for the us
 ## Basic usage
 
 ### Enumerating input sources
-The `inputSources` attribute on an `XRSession` will return a list of all `XRInputSource`s that the user agent considers active. The properties of an `XRInputSource` object are immutable. If a device can be manipulated in such a way that these properties can change, the `XRInputSource` will be removed from the array and a new entry created.
+The `inputSources` attribute on an `XRSession` returns a list of all `XRInputSource`s that the user agent considers active. The properties of an `XRInputSource` object are immutable. If a device can be manipulated in such a way that these properties can change, the `XRInputSource` will be removed from the array and a new entry created.
 
 ```js
 let inputSources = xrSession.inputSources;
@@ -382,7 +382,7 @@ This is a partial IDL and is considered additive to the core IDL found in the ma
 //
 
 partial interface XRSession {
-  readonly attribute FrozenArray<XRInputSource> inputSources;
+  readonly attribute XRInputSourceArray inputSources;
   
   attribute EventHandler onselect;
   attribute EventHandler onselectstart;
@@ -413,6 +413,13 @@ interface XRInputSource {
   readonly attribute XRSpace targetRaySpace;
   readonly attribute XRSpace? gripSpace;
   readonly attribute Gamepad? gamepad;
+};
+
+[SecureContext, Exposed=Window]
+interface XRInputSourceArray {
+  iterable<XRInputSource>;
+  readonly attribute unsigned long length;
+  getter XRInputSource(unsigned long index);
 };
 
 //

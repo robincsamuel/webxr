@@ -1162,6 +1162,7 @@ XRInputSourceArray {#xrinputsourcearray-interface}
 An {{XRInputSourceArray}} represents a [=/list=] of {{XRInputSource}}s. It is used in favor of a [=/frozen array type=] when the contents of the [=/list=] are expected to change over time, such as with the {{XRSession}} {{XRSession/inputSources}} attribute.
 
 <pre class="idl">
+[SecureContext, Exposed=Window]
 interface XRInputSourceArray {
   iterable&lt;XRInputSource&gt;;
   readonly attribute unsigned long length;
