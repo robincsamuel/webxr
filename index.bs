@@ -844,16 +844,26 @@ The [=effective origin=] of an {{XRSpace}} can only be observed in the coordinat
 
 <div class="algorithm" data-algorithm="populate-the-pose">
 
-To <dfn>populate the pose</dfn> of a {{XRSpace}} |space| in an  {{XRSpace}} |baseSpace| at the time represented by a {{XRFrame}} |frame| into an {{XRPose}} |pose|, the user agent MUST run the following steps:
+To <dfn>populate the pose</dfn> of a {{XRSpace}} |space| in an {{XRSpace}} |baseSpace| at the time represented by a {{XRFrame}} |frame| into an {{XRPose}} |pose|, the user agent MUST run the following steps:
 
   1. 1. If |frame|'s [=active=] boolean is <code>false</code>, throw an {{InvalidStateError}} and abort these steps.
   1. Let |session| be |frame|'s {{XRFrame/session}} object.
   1. If |space|'s [=XRSpace/session=] does not equal |session|, throw an {{InvalidStateError}} and abort these steps.
   1. If |baseSpace|'s [=XRSpace/session=] does not equal |session|, throw an {{InvalidStateError}} and abort these steps.
-  1. If |baseSpace|'s pose cannot be determined relative to |space| at the time represented by |frame|, set |pose| to <code>null</code>.
   1. Let |transform| be |pose|'s {{XRPose/transform}}.
-  1. Set |transform|'s {{XRRigidTransform/position}} to the location of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
-  1. Set |transform|'s {{XRRigidTransform/orientation}} to the orientation of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
+  1. Set |pose| based on the following:
+    <dl class="switch">
+      <dt> If |space|'s pose relative to |baseSpace| at the time represented by |frame| can be determined.
+      <dd> Set |transform|'s {{XRRigidTransform/position}} to the location of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
+      <dd> Set |transform|'s {{XRRigidTransform/orientation}} to the orientation of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
+      <dd> If |transform|'s {{XRRigidTransform/position}} was computed based on |space|'s orientation, such as via a neck or elbow model, set |pose|'s {{XRPose/emulatedPosition}} boolean to <code>true</code>.
+      <dt> Else if |space|'s pose relative to |baseSpace| has been determined in the past.
+      <dd> Set |transform|'s {{XRRigidTransform/position}} to the last known location of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
+      <dd> Set |transform|'s {{XRRigidTransform/orientation}} to the last known orientation of |space|'s [=effective origin=] in |baseSpace|'s [=coordinate system=].
+      <dd> Set |pose|'s {{XRPose/emulatedPosition}} boolean to <code>true</code>.
+      <dt> Else if |space|'s pose relative to |baseSpace| has never been determined.
+      <dd> Set |pose| to <code>null</code>.
+    </dl>
 
 </div>
 
@@ -1956,7 +1966,7 @@ A user agent MUST dispatch a <dfn event for="XRSession">selectend</dfn> event on
 
 A user agent MUST dispatch a <dfn event for="XRSession">select</dfn> event on an {{XRSession}} when one of its {{XRInputSource}}s has fully completed a [=primary action=]. The event MUST be of type {{XRInputSourceEvent}}.
 
-A user agent MUST dispatch a <dfn event for="XRReferenceSpace">reset</dfn> event on an {{XRReferenceSpace}} when discontinuities of the [=native origin=] or [=effective origin=] occur, i.e. there are significant changes in the origin’s position or orientation relative to the user’s environment. For example, after the user recalibrates their XR device or if the XR device automatically shifts its origin after losing and regaining tracking. This MUST happen when the {{boundsGeometry}} changes for a {{XRBoundedReferenceSpace}}. The event MUST be of type {{XRReferenceSpaceEvent}}, and MUST be dispatched prior to the execution of any [=XR animation frame=]s that make use of the new origin.
+A user agent MUST dispatch a <dfn event for="XRReferenceSpace">reset</dfn> event on an {{XRReferenceSpace}} when discontinuities of the [=native origin=] or [=effective origin=] occur, i.e. there are significant changes in the origin’s position or orientation relative to the user’s environment. (For example: After user recalibration of their XR device or if the XR device automatically shifts its origin after losing and regaining tracking.) A {{reset}} event MUST also be dispatched when the {{boundsGeometry}} changes for a {{XRBoundedReferenceSpace}}. {{reset}} events SHOULD NOT be dispatched if the [=viewer=]'s pose experiences discontinuities but the {{XRReferenceSpace}}'s origin remains stable. The event MUST be of type {{XRReferenceSpaceEvent}}, and MUST be dispatched prior to the execution of any [=XR animation frame=]s that make use of the new origin.
 
 Security, Privacy, and Comfort Considerations {#security}
 =============================================
