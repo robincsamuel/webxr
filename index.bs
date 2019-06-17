@@ -844,9 +844,9 @@ The [=effective origin=] of an {{XRSpace}} can only be observed in the coordinat
 
 <div class="algorithm" data-algorithm="populate-the-pose">
 
-To <dfn>populate the pose</dfn> of a {{XRSpace}} |space| in an {{XRSpace}} |baseSpace| at the time represented by a {{XRFrame}} |frame| into an {{XRPose}} |pose|, the user agent MUST run the following steps:
+To <dfn>populate the pose</dfn> of an {{XRSpace}} |space| in an {{XRSpace}} |baseSpace| at the time represented by an {{XRFrame}} |frame| into an {{XRPose}} |pose|, the user agent MUST run the following steps:
 
-  1. 1. If |frame|'s [=active=] boolean is <code>false</code>, throw an {{InvalidStateError}} and abort these steps.
+  1. If |frame|'s [=active=] boolean is <code>false</code>, throw an {{InvalidStateError}} and abort these steps.
   1. Let |session| be |frame|'s {{XRFrame/session}} object.
   1. If |space|'s [=XRSpace/session=] does not equal |session|, throw an {{InvalidStateError}} and abort these steps.
   1. If |baseSpace|'s [=XRSpace/session=] does not equal |session|, throw an {{InvalidStateError}} and abort these steps.
@@ -864,6 +864,8 @@ To <dfn>populate the pose</dfn> of a {{XRSpace}} |space| in an {{XRSpace}} |base
       <dt> Else if |space|'s pose relative to |baseSpace| has never been determined.
         <dd> Set |pose| to <code>null</code>.
     </dl>
+
+NOTE: The {{XRPose}}'s {{XRPose/emulatedPosition}} boolean does not indicate whether |baseSpace|'s position is emulated or not, only whether evaluating |space|'s position relative to |baseSpace| relies on emulation. For example, a controller with [=3DoF=] tracking would report poses with an {{XRPose/emulatedPosition}} of <code>true</code> when its {{targetRaySpace}} or {{gripSpace}} are queried against an {{XRReferenceSpace}}, but would likely report an {{XRPose/emulatedPosition}} of <code>false</code> if the pose of the {{targetRaySpace}} was queried in {{gripSpace}}, because the relationship between those two spaces should be known exactly.
 
 </div>
 
@@ -1297,9 +1299,7 @@ An {{XRPose}} describes a position and orientation in space relative to an {{XRS
 
 The <dfn attribute for="XRPose">transform</dfn> attribute describes the position and orientation relative to the base {{XRSpace}}.
 
-<section class="unstable">
 The <dfn attribute for="XRPose">emulatedPosition</dfn> attribute MUST be <code>false</code> if the {{XRPose/transform}}.{{XRRigidTransform/position}} values are based on sensor readings, or <code>true</code> if the position values are software estimations, such as those provided by a neck or arm model.
-</section> 
 
 XRViewerPose {#xrviewerpose-interface}
 -------------
@@ -1592,7 +1592,7 @@ dictionary XRWebGLLayerInit {
   double framebufferScaleFactor = 1.0;
 };
 
-[SecureContext, Exposed=Window, Constructor(XRSession session,`
+[SecureContext, Exposed=Window, Constructor(XRSession session,
              XRWebGLRenderingContext context,
              optional XRWebGLLayerInit layerInit)]
 interface XRWebGLLayer {
